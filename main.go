@@ -26,7 +26,9 @@ func main() {
 	conn.DropTableIfExists(models.User{})
 	conn.AutoMigrate(models.User{})
 
-	router := api.NewRouter(conn)
+	sess := db.NewStore()
+
+	router := api.NewRouter(conn, sess)
 
 	srv := &http.Server{
 		Handler:      router,

@@ -6,6 +6,7 @@ require (
 	github.com/aidarkhanov/nanoid v1.0.2
 	github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
+	github.com/garyburd/redigo v1.6.0 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.11
@@ -17,4 +18,5 @@ require (
 	golang.org/x/sys v0.0.0-20190927073244-c990c680b611 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190930201159-7c411dea38b0 // indirect
+	gopkg.in/boj/redistore.v1 v1.0.0-20160128113310-fc113767cd6b
 )

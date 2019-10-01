@@ -5,18 +5,20 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	redisstore "gopkg.in/boj/redistore.v1"
 )
 
 type Server struct {
 	Db *gorm.DB
+	S  *redisstore.RediStore
 }
 
-func NewRouter(db *gorm.DB) *mux.Router {
-	s := &Server{Db: db}
+func NewRouter(db *gorm.DB, sess *redisstore.RediStore) *mux.Router {
+	s := &Server{Db: db, S: sess}
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 	r.HandleFunc("/", index).Methods("GET")
-	ServeUserRoutes(s.Db, r)
+	ServeUserRoutes(s.Db, s.S, r)
 	return r
 }
 

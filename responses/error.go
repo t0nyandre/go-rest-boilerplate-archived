@@ -14,6 +14,10 @@ type Error struct {
 	Message string `json:"message,omitempty"`
 }
 
+type CustomResponse struct {
+	Message string `json:"message"`
+}
+
 func NewResponse(w http.ResponseWriter, statusCode int, err error, data interface{}) {
 	w.WriteHeader(statusCode)
 	res := Response{}

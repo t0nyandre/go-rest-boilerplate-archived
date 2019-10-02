@@ -6,12 +6,14 @@ require (
 	github.com/aidarkhanov/nanoid v1.0.2
 	github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
-	github.com/garyburd/redigo v1.6.0 // indirect
+	github.com/garyburd/redigo v1.6.0
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
+	github.com/jordan-wright/email v0.0.0-20190819015918-041e0cec78b0
 	github.com/lib/pq v1.2.0 // indirect
+	github.com/thanhpk/randstr v1.0.4
 	golang.org/x/crypto v0.0.0-20190927123631-a832865fa7ad // indirect
 	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect

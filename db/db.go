@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/aidarkhanov/nanoid"
 	"github.com/jinzhu/gorm"
 )
 
@@ -16,12 +15,6 @@ type ModelID struct {
 type Timestamp struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"null"`
-}
-
-// BeforeCreate will generate a unique nanoid as the ID of the inserted table
-func (model *ModelID) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", nanoid.New())
-	return nil
 }
 
 func NewDBConnection() *gorm.DB {

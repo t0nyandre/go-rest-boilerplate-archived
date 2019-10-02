@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
 	redisstore "gopkg.in/boj/redistore.v1"
 )
 
@@ -14,7 +15,7 @@ func NewStore() *redisstore.RediStore {
 	}
 
 	store.Options.HttpOnly = true
-	store.SetKeyPrefix("sess:")
+	store.SetKeyPrefix(string(extras.SessionPrefix))
 	store.SetMaxAge(60 * 60 * 24 * 7) // 7days
 
 	return store

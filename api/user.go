@@ -56,7 +56,7 @@ func (u *userResources) Confirm(w http.ResponseWriter, r *http.Request) {
 		responses.NewResponse(w, 401, fmt.Errorf("%s", extras.BadTokenError), nil)
 		return
 	}
-	id, err := redConn.Do("GET", token)
+	id, err := redConn.Do("GET", fmt.Sprintf("%s%s", extras.ConfirmAccountPrefix, token))
 	if err != nil {
 		responses.NewResponse(w, 401, fmt.Errorf("%s", extras.BadTokenError), nil)
 		return
@@ -73,7 +73,7 @@ func (u *userResources) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = redConn.Do("DEL", token)
+	_, err = redConn.Do("DEL", fmt.Sprintf("%s%s", extras.ConfirmAccountPrefix, token))
 	if err != nil {
 		responses.NewResponse(w, 500, fmt.Errorf("%s", err.Error()), nil)
 		return
@@ -88,7 +88,8 @@ func (u *userResources) Profile(w http.ResponseWriter, r *http.Request) {
 
 	session, err := u.S.Get(r, "sid")
 	if err != nil {
-		responses.NewResponse(w, 500, err, nil)
+		responses.NewResponse(w, 401, fmt.Errorf("%s", extras.AccessDenied), nil)
+		return
 	}
 
 	id := session.Values["user_id"]
@@ -139,7 +140,7 @@ func (u *userResources) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := randstr.Hex(22)
-	_, err := redConn.Do("SET", token, newUser.ID, "EX", 60*60*24*3, "NX")
+	_, err := redConn.Do("SET", fmt.Sprintf("%s%s", extras.ConfirmAccountPrefix, token), newUser.ID, "EX", 60*60*24*3, "NX")
 	if err != nil {
 		responses.NewResponse(w, 500, fmt.Errorf("Could not create user: %s", err.Error()), nil)
 		return

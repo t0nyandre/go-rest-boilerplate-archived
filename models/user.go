@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/aidarkhanov/nanoid"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/db"
@@ -12,12 +13,13 @@ type User struct {
 	Email     string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
 	Password  string `json:"-" gorm:"not null"`
 	Role      string `json:"role,omitempty" gorm:"default:'Member'"`
-	Confirmed bool   `json:"confirmed" gorm:"default:true"`
+	Confirmed bool   `json:"confirmed" gorm:"default:false"`
 	db.Timestamp
 }
 
 // BeforeSave will hash the password with Argon2ID algorithm
-func (user *User) BeforeSave(scope *gorm.Scope) error {
+func (user *User) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("ID", nanoid.New())
 	scope.SetColumn("Password", user.HashPassword())
 	return nil
 }
@@ -37,7 +39,7 @@ func (user *User) HashPassword() string {
 		panic(err.Error())
 	}
 
-	return string(hash)
+	return hash
 }
 
 // VerifyPassword is comparing the plain text password to the hased password in the database

@@ -3,9 +3,9 @@ package extras
 type Prefix string
 
 const (
-	SessionPrefix        Prefix = "sess:"
-	ConfirmAccountPrefix Prefix = "conf:"
-	ResetPasswordPrefix  Prefix = "pw:"
+	SessionPrefix        Prefix = "session:"
+	ConfirmAccountPrefix Prefix = "confirm:"
+	ResetPasswordPrefix  Prefix = "reset:"
 )
 
 type EmailTemplates string

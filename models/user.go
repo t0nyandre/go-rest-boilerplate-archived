@@ -10,9 +10,9 @@ import (
 // User model
 type User struct {
 	db.ModelID
-	Email     string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
+	Email     string `json:"email" gorm:"type:varchar(100);not null;unique_index"`
 	Password  string `json:"-" gorm:"not null"`
-	Role      string `json:"role,omitempty" gorm:"default:'Member'"`
+	Role      string `json:"role" gorm:"default:'Member'"`
 	Confirmed bool   `json:"confirmed" gorm:"default:false"`
 	db.Timestamp
 }

@@ -148,11 +148,7 @@ func (u *userResources) Create(w http.ResponseWriter, r *http.Request) {
 
 	confirmData.ConfirmURL = fmt.Sprintf("%s%s/%s", os.Getenv("APP_URL"), os.Getenv("APP_CONFIRM_PATH"), token)
 
-	err = extras.SendEmail("Tony Andre Haugen <no_reply@tonyandre.co>", []string{input.Email}, "Just one more step to go ...", extras.ConfirmAccount, confirmData)
-	if err != nil {
-		responses.NewResponse(w, 500, fmt.Errorf("Could not send confirmation mail: %s", err.Error()), nil)
-		return
-	}
+	go extras.SendEmail("Tony Andre Haugen <no_reply@tonyandre.co>", []string{input.Email}, "Just one more step to go ...", extras.ConfirmAccount, confirmData)
 
 	w.Header().Set("Location", fmt.Sprintf("%s%s%s", r.Host, "/user/", newUser.ID))
 	responses.NewResponse(w, 201, nil, newUser)

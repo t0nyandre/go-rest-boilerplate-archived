@@ -11,10 +11,13 @@ import (
 	"github.com/jordan-wright/email"
 )
 
+// Email structure which holds the parsed HTML template for the emails
 type Email struct {
 	HTML []byte
 }
 
+// SendEmail will handle all the generation of automaticly sent emails from this API/project.
+// Templates can be found end customized in the "emails" folder under "extras" package
 func SendEmail(from string, to []string, subject string, html EmailTemplates, data interface{}) error {
 	em := Email{}
 	e := email.NewEmail()

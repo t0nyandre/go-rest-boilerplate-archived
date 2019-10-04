@@ -4,20 +4,20 @@ import (
 	"github.com/aidarkhanov/nanoid"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/db"
 )
 
-// User model
+// User model which structures the database table and how it's represented as json
 type User struct {
-	db.ModelID
-	Email     string `json:"email" gorm:"type:varchar(100);not null;unique_index"`
+	ModelID
+	Username  string `json:"username,omitempty" gorm:"type:varchar(100);not null;unique"`
+	Email     string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
 	Password  string `json:"-" gorm:"not null"`
-	Role      string `json:"role" gorm:"default:'Member'"`
-	Confirmed bool   `json:"confirmed" gorm:"default:false"`
-	db.Timestamp
+	Role      string `json:"role,omitempty" gorm:"default:'Member'"`
+	Confirmed bool   `json:"confirmed,omitempty" gorm:"default:false"`
+	Timestamp
 }
 
-// BeforeSave will hash the password with Argon2ID algorithm
+// BeforeCreate will hash the password and create an ID for the User
 func (user *User) BeforeCreate(scope *gorm.Scope) error {
 	scope.SetColumn("ID", nanoid.New())
 	scope.SetColumn("Password", user.HashPassword())

@@ -4,31 +4,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	redisstore "gopkg.in/boj/redistore.v1"
+	"gitlab.com/t0nyandre/go-rest-boilerplate/middleware"
 )
 
-type Server struct {
-	Db *gorm.DB
-	S  *redisstore.RediStore
-}
-
-func NewRouter(db *gorm.DB, sess *redisstore.RediStore) *mux.Router {
-	s := &Server{Db: db, S: sess}
-	r := mux.NewRouter()
-	r.Use(commonMiddleware)
+func NewRouter() *mux.Router {
+	r := mux.NewRouter().StrictSlash(true)
+	r.Use(middleware.HeaderMiddleware)
 	r.HandleFunc("/", index).Methods("GET")
-	ServeUserRoutes(s.Db, s.S, r)
+	ServeUserRoutes(r)
+	ServeAuthRoutes(r)
 	return r
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func index(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte("HELLO WORLD!!!"))
-}
-
-func commonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
 }

@@ -10,33 +10,33 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/api"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/db"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
+	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
-func main() {
-	var err error
-
-	err = godotenv.Load()
-	if err != nil {
-		panic(err)
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
 	}
+}
 
-	conn := db.NewDBConnection()
-	conn.DropTableIfExists(models.User{})
-	conn.AutoMigrate(models.User{})
+func main() {
+	// Establish connection to Database and the Redis Store
+	models.TestConnection()
+	// Create a new Session Store
+	utils.NewSession()
 
-	sess := db.NewStore()
+	// Generate all the routes
+	router := api.NewRouter()
 
-	router := api.NewRouter(conn, sess)
-
-	srv := &http.Server{
+	server := &http.Server{
 		Handler:      router,
 		Addr:         fmt.Sprintf("%s:%s", os.Getenv("API_HOST"), os.Getenv("API_PORT")),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	fmt.Printf("Server running on http://%s\n", srv.Addr)
-	log.Fatal(srv.ListenAndServe())
+	fmt.Printf("Server running on http://%s\n", server.Addr)
+	log.Fatal(server.ListenAndServe())
 }

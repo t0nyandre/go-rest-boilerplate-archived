@@ -73,6 +73,7 @@ func (res *userResources) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 type createInput struct {
+	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
@@ -90,6 +91,7 @@ func (res *userResources) Create(w http.ResponseWriter, req *http.Request) {
 	json.NewDecoder(req.Body).Decode(&input)
 
 	newUser := models.User{
+		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
 	}

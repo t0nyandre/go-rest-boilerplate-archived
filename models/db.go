@@ -28,9 +28,14 @@ type Timestamp struct {
 // Connect to the database and store the gorm.DB type to the global variable Db
 func Connect() *gorm.DB {
 	var sslmode string
-	if os.Getenv("API_ENV") == "dev" {
+	switch os.Getenv("API_ENV") {
+	case "dev":
 		sslmode = "disable"
-	} else {
+		break
+	case "test":
+		sslmode = "disable"
+		break
+	default:
 		sslmode = "require"
 	}
 

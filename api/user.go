@@ -12,6 +12,7 @@ import (
 	"github.com/go-session/session"
 	"github.com/gorilla/mux"
 	"github.com/thanhpk/randstr"
+	"gitlab.com/t0nyandre/go-rest-boilerplate/email"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/middleware"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
@@ -111,7 +112,7 @@ func (res *userResources) Create(w http.ResponseWriter, req *http.Request) {
 	confirmData.ConfirmURL = fmt.Sprintf("%s%s/%s", os.Getenv("APP_URL"), os.Getenv("APP_CONFIRM_PATH"), token)
 
 	if os.Getenv("API_ENV") != "dev" {
-		go extras.SendEmail("Tony Andre Haugen <no_reply@tonyandre.co>", []string{input.Email}, "Just one more step to go ...", extras.ConfirmAccount, confirmData)
+		go email.ConfirmAccountEmail("Tony Andre Haugen <no_reply@tonyandre.co>", []string{input.Email}, confirmData)
 	} else {
 		w.Header().Set("ConfirmURL", confirmData.ConfirmURL)
 	}

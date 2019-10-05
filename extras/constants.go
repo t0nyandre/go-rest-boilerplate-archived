@@ -18,8 +18,6 @@ type EmailTemplates string
 const (
 	// ConfirmAccount holds the filename for the template used for sending out confirmation emails
 	ConfirmAccount EmailTemplates = "confirmaccount.html"
-	// ResetPassword holds the filename for the template used for sending out reset password emails
-	ResetPassword EmailTemplates = "resetpassword.html"
 )
 
 // ErrorMsg is self explanatory

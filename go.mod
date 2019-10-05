@@ -6,6 +6,7 @@ require (
 	github.com/aidarkhanov/nanoid v1.0.2
 	github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0 // indirect
+	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/go-session/redis v3.0.1+incompatible
 	github.com/go-session/session v3.1.2+incompatible
@@ -15,6 +16,8 @@ require (
 	github.com/jordan-wright/email v0.0.0-20190819015918-041e0cec78b0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.2.0 // indirect
+	github.com/mailgun/mailgun-go/v3 v3.6.0
+	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/onsi/ginkgo v1.10.2 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect

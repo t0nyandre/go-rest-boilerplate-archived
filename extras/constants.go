@@ -5,7 +5,8 @@ type Prefix string
 
 const (
 	// SessionPrefix for prefixing the redisdatabase
-	SessionPrefix Prefix = "session:"
+	RefreshTokenPrefix Prefix = "rt:"
+	AccessTokenPrefix  Prefix = "access:"
 	// ConfirmAccountPrefix for prefixing the redisdatabase
 	ConfirmAccountPrefix Prefix = "confirm:"
 	// ResetPasswordPrefix for prefixing the redisdatabase

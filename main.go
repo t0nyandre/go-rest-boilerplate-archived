@@ -22,10 +22,10 @@ func init() {
 }
 
 func main() {
-	// Establish connection to Database and the Redis Store
+	// Establish connection to Database
 	models.TestConnection()
-	// Create a new Session Store
-	utils.NewSession()
+	// Establish connection to Redis
+	utils.ConnectRedis()
 
 	// Generate all the routes
 	router := api.NewRouter()

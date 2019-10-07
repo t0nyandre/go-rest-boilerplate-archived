@@ -6,13 +6,27 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// UserRole has all the account roles for this application
+type UserRole string
+
+const (
+	// Admin has full control over the access system
+	Admin UserRole = "admin"
+	// Pro is members that support me in any kind of way
+	Pro UserRole = "pro"
+	// Contributer is members that helps the community out in any way
+	Contributer UserRole = "contributer"
+	// Member are allowed to post comments and get access to member only things
+	Member UserRole = "member"
+)
+
 // User model which structures the database table and how it's represented as json
 type User struct {
 	ModelID
 	Username  string `json:"username,omitempty" gorm:"type:varchar(100);not null;unique"`
 	Email     string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
 	Password  string `json:"-" gorm:"not null"`
-	Role      string `json:"role,omitempty" gorm:"default:'Member'"`
+	Role      string `json:"role,omitempty" gorm:"default:'member'"`
 	Confirmed bool   `json:"confirmed,omitempty" gorm:"default:false"`
 	Timestamp
 }

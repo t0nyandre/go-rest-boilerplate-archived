@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -19,6 +20,11 @@ type tokenRes struct {
 
 func NewRouter() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
+	ratelimit, err := middleware.RateLimit()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.Use(ratelimit.Handler)
 	r.Use(middleware.HeaderMiddleware)
 	r.HandleFunc("/refresh-token", RefreshToken).Methods("POST")
 	ServeAuthRoutes(r)

@@ -23,13 +23,12 @@ const (
 // User model which structures the database table and how it's represented as json
 type User struct {
 	ModelID
-	Username     string `json:"username,omitempty" gorm:"type:varchar(100);not null;unique"`
-	Email        string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
-	Password     string `json:"-" gorm:"not null"`
-	Role         string `json:"role,omitempty" gorm:"default:'member'"`
-	Confirmed    bool   `json:"confirmed,omitempty" gorm:"default:false"`
-	Locked       bool   `json:"islocked,omitempty" gorm:"default:false"`
-	LockedReason string `json:"locked_reason,omitempty" gorm:"null"`
+	Username  string `json:"username,omitempty" gorm:"type:varchar(100);not null;unique"`
+	Email     string `json:"email,omitempty" gorm:"type:varchar(100);not null;unique_index"`
+	Password  string `json:"-" gorm:"not null"`
+	Role      string `json:"role,omitempty" gorm:"default:'member'"`
+	Confirmed bool   `json:"confirmed,omitempty" gorm:"default:false"`
+	Disabled  bool   `json:"disabled,omitempty" gorm:"default:false"`
 	Timestamp
 }
 
@@ -73,16 +72,7 @@ func (user *User) UserConfirmed() bool {
 	return user.Confirmed
 }
 
-type LockedAccount struct {
-	Locked bool   `json:"islocked"`
-	Reason string `json:"locked_reason,omitempty"`
-}
-
-// UserLocked checks if the user is locked and which reason it's locked
-func (user *User) UserLocked() *LockedAccount {
-	locked := &LockedAccount{
-		Locked: user.Locked,
-		Reason: user.LockedReason,
-	}
-	return locked
+// UserDisabled checks if the user is disabled or not
+func (user *User) UserDisabled() bool {
+	return user.Disabled
 }

@@ -27,6 +27,8 @@ func ServeAuthRoutes(r *mux.Router) {
 	r.HandleFunc("/users/confirm/{token}", res.Confirm).Methods("GET")
 	r.HandleFunc("/users/login", res.Login).Methods("POST")
 	r.HandleFunc("/users/logout", res.Logout).Methods("POST")
+	r.HandleFunc("/users/password", res.ForgotPassword).Methods("POST")
+	r.HandleFunc("/users/password", res.ChangePassword).Methods("PATCH")
 	r.HandleFunc("/users/register", res.Register).Methods("POST")
 	r.HandleFunc("/users/me", middleware.AuthRequired(res.Me)).Methods("GET")
 }
@@ -68,6 +70,94 @@ func (res *authResources) Confirm(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Location", fmt.Sprintf("%s%s%s", req.Host, "/users/", user.Username))
 	responses.NewResponse(w, 201, nil, &loginRes)
+}
+
+type forgotPW struct {
+	Email string `json:"email"`
+}
+
+func (res *authResources) ForgotPassword(w http.ResponseWriter, req *http.Request) {
+	var input forgotPW
+	var user models.User
+	var forgotData emailData
+
+	err := json.NewDecoder(req.Body).Decode(&input)
+	if err != nil {
+		log.Printf("%v", err)
+		return
+	}
+
+	if err = models.Db.First(&user, "email = ?", input.Email).Error; err != nil {
+		log.Printf("Error getting user: %v", err)
+		return
+	}
+
+	res.removeRefreshToken(w)
+
+	if user.UserDisabled() {
+		log.Printf("User is disabled")
+		return
+	}
+
+	token := randstr.Hex(22)
+	_, err = utils.Store.Set(fmt.Sprintf("%s%s", extras.ResetPasswordPrefix, token), user.ID, time.Second*60*60).Result()
+	if err != nil {
+		log.Printf("Error saving token to Redis: %v", err)
+		return
+	}
+
+	forgotData.ConfirmURL = fmt.Sprintf("%s%s/%s", os.Getenv("APP_URL"), os.Getenv("APP_FORGOTPW_PATH"), token)
+
+	if os.Getenv("API_ENV") != "dev" {
+		// go email.ForgotPasswordEmail("Tony Andre Haugen <no_reply@tonyandre.co>", []string{input.Email}, forgotData)
+	} else {
+		w.Header().Set("Forgot-PW-URL", forgotData.ConfirmURL)
+	}
+
+	responses.NewResponse(w, 200, nil, nil)
+}
+
+type changePW struct {
+	NewPassword string `json:"password"`
+	Token       string `json:"token"`
+}
+
+func (res *authResources) ChangePassword(w http.ResponseWriter, req *http.Request) {
+	var input changePW
+	var user models.User
+
+	err := json.NewDecoder(req.Body).Decode(&input)
+	if err != nil {
+		log.Printf("%v", err)
+		return
+	}
+
+	id, err := utils.Store.Get(fmt.Sprintf("%s%s", extras.ResetPasswordPrefix, input.Token)).Result()
+	if err != nil {
+		log.Printf("%v", err)
+		return
+	}
+
+	if err = models.Db.First(&user, "id = ?", id).Error; err != nil {
+		log.Printf("Error getting user: %v", err)
+		return
+	}
+
+	user.Password = input.NewPassword
+	user.Password = user.HashPassword()
+
+	if err = models.Db.Save(&user).Error; err != nil {
+		log.Printf("%v", err)
+		return
+	}
+
+	_, err = utils.Store.Del(fmt.Sprintf("%s%s", extras.ResetPasswordPrefix, input.Token)).Result()
+	if err != nil {
+		log.Printf("%v", err)
+		return
+	}
+
+	responses.NewResponse(w, 200, nil, nil)
 }
 
 type loginInput struct {
@@ -117,8 +207,8 @@ func (res *authResources) loginUser(w http.ResponseWriter, user models.User) {
 		return
 	}
 
-	if user.UserLocked().Locked {
-		responses.NewResponse(w, 401, fmt.Errorf("Account is locked: %s", user.UserLocked().Reason), nil)
+	if user.UserDisabled() {
+		responses.NewResponse(w, 401, fmt.Errorf("Account is disabled"), nil)
 		return
 	}
 

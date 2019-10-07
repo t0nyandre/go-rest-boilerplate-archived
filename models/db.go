@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
 // Db is the global database connection used throughout the whole application
@@ -63,7 +62,6 @@ func Connect() *gorm.DB {
 // It will give a log feedback if successful or failure
 func TestConnection() {
 	Connect()
-	utils.ConnectRedis()
 	Db.DropTableIfExists(&User{})
 	Db.AutoMigrate(&User{})
 	log.Println("Connection to database was a success!")

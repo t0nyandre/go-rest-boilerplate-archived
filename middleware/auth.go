@@ -4,45 +4,37 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
-	"github.com/go-session/session"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
 	"gitlab.com/t0nyandre/go-rest-boilerplate/responses"
+	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
-type authUser struct {
-	UserID string
-	Role   string
-}
+type ContextType string
+
+const LoggedInUserCtx ContextType = "AuthUser"
 
 // AuthRequired is the middleware used to protect an endpoint
 func AuthRequired(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var user models.User
-		var authUser authUser
+		ctx := r.Context()
+		authorization := r.Header.Get("Authorization")
 
-		store, err := session.Start(context.Background(), w, r)
+		token := strings.Split(fmt.Sprintf("%s", authorization), " ")
+		if len(token) < 2 {
+			responses.NewResponse(w, 401, fmt.Errorf("%s", extras.BadTokenError), nil)
+			return
+		}
+
+		payload, err := utils.ValidateAccessToken(token[1])
 		if err != nil {
-			responses.NewResponse(w, 401, fmt.Errorf("%s", extras.AccessDenied), nil)
+			responses.NewResponse(w, 401, fmt.Errorf("%s", extras.BadTokenError), nil)
 			return
 		}
 
-		value, ok := store.Get("user_id")
-		if !ok {
-			session.Destroy(context.Background(), w, r)
-			responses.NewResponse(w, 401, fmt.Errorf("%s", extras.AccessDenied), nil)
-			return
-		}
+		ctx = context.WithValue(ctx, LoggedInUserCtx, payload)
 
-		authUser.UserID = fmt.Sprintf("%s", value)
-
-		if err := models.Db.First(&user, "id = ?", authUser.UserID).Error; err != nil {
-			session.Destroy(context.Background(), w, r)
-			responses.NewResponse(w, 401, fmt.Errorf("%s", extras.AccessDenied), nil)
-			return
-		}
-
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

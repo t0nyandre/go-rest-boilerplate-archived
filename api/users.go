@@ -102,11 +102,6 @@ func (res *authResources) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !user.UserConfirmed() {
-		responses.NewResponse(w, 401, fmt.Errorf("You haven't confirmed your account yet. Please check your email and click the link for confirmation"), nil)
-		return
-	}
-
 	res.loginUser(w, user)
 	loginRes := loginResponse{&user, utils.GenerateAccessToken(user)}
 
@@ -116,6 +111,17 @@ func (res *authResources) Login(w http.ResponseWriter, req *http.Request) {
 
 func (res *authResources) loginUser(w http.ResponseWriter, user models.User) {
 	var secure bool
+
+	if !user.UserConfirmed() {
+		responses.NewResponse(w, 401, fmt.Errorf("You haven't confirmed your account yet. Please check your email and click the link for confirmation"), nil)
+		return
+	}
+
+	if user.UserLocked().Locked {
+		responses.NewResponse(w, 401, fmt.Errorf("Account is locked: %s", user.UserLocked().Reason), nil)
+		return
+	}
+
 	jid := nanoid.New()
 	if _, err := utils.Store.Set(fmt.Sprintf("%s%s", extras.RefreshTokenPrefix, jid), utils.GenerateRefreshToken(user), time.Second*60*60*24*30).Result(); err != nil {
 		fmt.Println(err.Error())
@@ -144,6 +150,12 @@ type emailData struct {
 
 // Logout is used for logging the user out byt removing their session and make their cookie "sid" blank.
 func (res *authResources) Logout(w http.ResponseWriter, req *http.Request) {
+	res.removeRefreshToken(w)
+
+	responses.NewResponse(w, 200, nil, nil)
+}
+
+func (res *authResources) removeRefreshToken(w http.ResponseWriter) {
 	var secure bool
 
 	if os.Getenv("API_ENV") == "dev" {
@@ -162,8 +174,6 @@ func (res *authResources) Logout(w http.ResponseWriter, req *http.Request) {
 	}
 
 	http.SetCookie(w, &delCookie)
-
-	responses.NewResponse(w, 200, nil, &responses.CustomResponse{Message: "Successfully logged out"})
 }
 
 type createInput struct {

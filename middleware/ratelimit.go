@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
+	"github.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
 var limiter = utils.NewIPRateLimiter(1, 9)

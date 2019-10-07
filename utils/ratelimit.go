@@ -1,56 +1,54 @@
-package utils
+package main
 
 import (
-	"sync"
+	"fmt"
+	"log"
+	"net/http"
 
-	"golang.org/x/time/rate"
+	redis "github.com/go-redis/redis"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/middleware/stdlib"
+	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 )
 
-// IPRateLimiter .
-type IPRateLimiter struct {
-	ips map[string]*rate.Limiter
-	mu  *sync.RWMutex
-	r   rate.Limit
-	b   int
-}
+func main() {
 
-// NewIPRateLimiter .
-func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
-	i := &IPRateLimiter{
-		ips: make(map[string]*rate.Limiter),
-		mu:  &sync.RWMutex{},
-		r:   r,
-		b:   b,
+	// Define a limit rate to 4 requests per hour.
+	rate, err := limiter.NewRateFromFormatted("4-H")
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
 
-	return i
-}
+	// Create a redis client.
+	option, err := redis.ParseURL("redis://localhost:6379/0")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	client := redis.NewClient(option)
 
-// AddIP creates a new rate limiter and adds it to the ips map,
-// using the IP address as the key
-func (i *IPRateLimiter) AddIP(ip string) *rate.Limiter {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	limiter := rate.NewLimiter(i.r, i.b)
-
-	i.ips[ip] = limiter
-
-	return limiter
-}
-
-// GetLimiter returns the rate limiter for the provided IP address if it exists.
-// Otherwise calls AddIP to add IP address to the map
-func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
-	i.mu.Lock()
-	limiter, exists := i.ips[ip]
-
-	if !exists {
-		i.mu.Unlock()
-		return i.AddIP(ip)
+	// Create a store with the redis client.
+	store, err := sredis.NewStoreWithOptions(client, limiter.StoreOptions{
+		Prefix:   "limiter_http_example",
+		MaxRetry: 3,
+	})
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
 
-	i.mu.Unlock()
+	// Create a new middleware with the limiter instance.
+	middleware := stdlib.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
 
-	return limiter
+	// Launch a simple server.
+	http.Handle("/", middleware.Handler(http.HandlerFunc(index)))
+	fmt.Println("Server is running on port 7777...")
+	log.Fatal(http.ListenAndServe(":7777", nil))
+
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write([]byte(`{"message": "ok"}`))
 }

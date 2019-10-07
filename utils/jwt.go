@@ -6,8 +6,8 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
+	"github.com/t0nyandre/go-rest-boilerplate/extras"
+	"github.com/t0nyandre/go-rest-boilerplate/models"
 )
 
 // AccessTokenClaims enough to validate the user and give the user his access

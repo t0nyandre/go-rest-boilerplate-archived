@@ -1,6 +1,6 @@
 package email
 
-import "gitlab.com/t0nyandre/go-rest-boilerplate/extras"
+import "github.com/t0nyandre/go-rest-boilerplate/extras"
 
 // ConfirmAccountEmail for sending out confirmation emails when a user creates an account
 func ConfirmAccountEmail(from string, to []string, data interface{}) {

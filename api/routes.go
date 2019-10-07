@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/middleware"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/responses"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
+	"github.com/t0nyandre/go-rest-boilerplate/extras"
+	"github.com/t0nyandre/go-rest-boilerplate/middleware"
+	"github.com/t0nyandre/go-rest-boilerplate/models"
+	"github.com/t0nyandre/go-rest-boilerplate/responses"
+	"github.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
 type tokenRes struct {

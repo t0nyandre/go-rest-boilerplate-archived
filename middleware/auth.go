@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"gitlab.com/t0nyandre/go-rest-boilerplate/extras"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/responses"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
+	"github.com/t0nyandre/go-rest-boilerplate/extras"
+	"github.com/t0nyandre/go-rest-boilerplate/responses"
+	"github.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
 type ContextType string

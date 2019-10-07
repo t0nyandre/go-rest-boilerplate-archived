@@ -9,9 +9,9 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/api"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/models"
-	"gitlab.com/t0nyandre/go-rest-boilerplate/utils"
+	"github.com/t0nyandre/go-rest-boilerplate/api"
+	"github.com/t0nyandre/go-rest-boilerplate/models"
+	"github.com/t0nyandre/go-rest-boilerplate/utils"
 )
 
 func init() {

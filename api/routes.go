@@ -53,8 +53,8 @@ func RefreshToken(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if user.UserLocked().Locked {
-		responses.NewResponse(w, 401, fmt.Errorf("Account is locked: %s", user.UserLocked().Reason), nil)
+	if user.UserDisabled() {
+		responses.NewResponse(w, 401, fmt.Errorf("Account is disabled"), nil)
 		return
 	}
 

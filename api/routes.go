@@ -53,6 +53,11 @@ func RefreshToken(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if user.UserLocked().Locked {
+		responses.NewResponse(w, 401, fmt.Errorf("Account is locked: %s", user.UserLocked().Reason), nil)
+		return
+	}
+
 	accessToken := &tokenRes{utils.GenerateAccessToken(user)}
 
 	w.Header().Set("Location", fmt.Sprintf("%s%s%s", req.Host, "/users/", user.Username))
